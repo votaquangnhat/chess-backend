@@ -11,6 +11,20 @@ game = chess.Board()
 def index():
     return jsonify({'message': 'Chess game server is running'})
 
+def check_game_status():
+    """Check the game status and return the result."""
+    if game.is_checkmate():
+        return 'White wins!' if not game.turn else 'Black wins!'
+    elif game.is_stalemate():
+        return 'Stalemate'
+    elif game.is_insufficient_material():
+        return 'Draw (Insufficient Material)'
+    elif game.is_fifty_moves():
+        return 'Draw (50-move rule)'
+    elif game.is_fivefold_repetition():
+        return 'Draw (Fivefold Repetition)'
+    return None
+
 @socketio.on('move')
 def handle_move(data):
     global game
@@ -20,10 +34,15 @@ def handle_move(data):
         move = chess.Move.from_uci(from_square + to_square)
         if move in game.legal_moves:
             game.push(move)
-            emit('update', {'fen': game.fen(),
-                            'turn': 'white' if game.turn else 'black',
-                            'message': ('black' if game.turn else 'white') + ':' + from_square + to_square},
-                broadcast=True)
+            result = check_game_status()
+            if result:
+                emit('announcement', {'result': result}, broadcast=True)
+            else:
+                emit('update', {'fen': game.fen(),
+                                'turn': 'white' if game.turn else 'black',
+                                'message': ('black' if game.turn else 'white') + ':' + from_square + to_square},
+                    broadcast=True)
+
         else:
             emit('error', {'message': 'Illegal move'}, broadcast=True)
     except Exception as e:
@@ -50,11 +69,14 @@ def handle_ai_move(data):
         try:
             if move in game.legal_moves:
                 game.push(move)
-                print(move)
-                emit('update', {'fen': game.fen(),
-                                'turn': 'white' if game.turn else 'black',
-                                'message': ('black' if game.turn else 'white') + ':' + chess.Move.uci(move)},
-                    broadcast=True)
+                result = check_game_status()
+                if result:
+                    emit('announcement', {'result': result}, broadcast=True)
+                else:
+                    emit('update', {'fen': game.fen(),
+                                    'turn': 'white' if game.turn else 'black',
+                                    'message': ('black' if game.turn else 'white') + ':' + chess.Move.uci(move)},
+                        broadcast=True)
             else:
                 emit('error', {'message': 'Illegal move'}, broadcast=True)
         except Exception as e:

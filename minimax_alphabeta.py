@@ -2,53 +2,63 @@ import random
 import chess
 
 #The higher the score, the better the piece
-piece_score = {"K": 0, "Q": 9, "R": 5, "B": 3, "N": 3, "P": 1}
+piece_score = {"K": 0, "Q": 10, "R": 5, "B": 3, "N": 3, "P": 1}
 
 #The higher the score, the better the position of the piece
-knight_scores = [[0.0, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.0],
-                 [0.1, 0.3, 0.5, 0.5, 0.5, 0.5, 0.3, 0.1],
-                 [0.2, 0.5, 0.6, 0.65, 0.65, 0.6, 0.5, 0.2],
-                 [0.2, 0.55, 0.65, 0.7, 0.7, 0.65, 0.55, 0.2],
-                 [0.2, 0.5, 0.65, 0.7, 0.7, 0.65, 0.5, 0.2],
-                 [0.2, 0.55, 0.6, 0.65, 0.65, 0.6, 0.55, 0.2],
-                 [0.1, 0.3, 0.5, 0.55, 0.55, 0.5, 0.3, 0.1],
-                 [0.0, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.0]]
+knight_scores = [
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 2, 2, 2, 2, 2, 2, 1],
+    [1, 2, 3, 3, 3, 3, 2, 1],
+    [1, 2, 3, 4, 4, 3, 2, 1],
+    [1, 2, 3, 4, 4, 3, 2, 1],
+    [1, 2, 3, 3, 3, 3, 2, 1],
+    [1, 2, 2, 2, 2, 2, 2, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+]
 
-bishop_scores = [[0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0],
-                 [0.2, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.2],
-                 [0.2, 0.4, 0.5, 0.6, 0.6, 0.5, 0.4, 0.2],
-                 [0.2, 0.5, 0.5, 0.6, 0.6, 0.5, 0.5, 0.2],
-                 [0.2, 0.4, 0.6, 0.6, 0.6, 0.6, 0.4, 0.2],
-                 [0.2, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.2],
-                 [0.2, 0.5, 0.4, 0.4, 0.4, 0.4, 0.5, 0.2],
-                 [0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0]]
+bishop_scores = [
+    [4, 3, 2, 1, 1, 2, 3, 4],
+    [3, 4, 3, 2, 2, 3, 4, 3],
+    [2, 3, 4, 3, 3, 4, 3, 2],
+    [1, 2, 3, 4, 4, 3, 2, 1],
+    [1, 2, 3, 4, 4, 3, 2, 1],
+    [2, 3, 4, 3, 3, 4, 3, 2],
+    [3, 4, 3, 2, 2, 3, 4, 3],
+    [4, 3, 2, 1, 1, 2, 3, 4],
+]
 
-rook_scores = [[0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25],
-               [0.5, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.5],
-               [0.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.0],
-               [0.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.0],
-               [0.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.0],
-               [0.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.0],
-               [0.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.0],
-               [0.25, 0.25, 0.25, 0.5, 0.5, 0.25, 0.25, 0.25]]
+rook_scores = [
+    [4, 3, 4, 4, 4, 4, 3, 4],
+    [4, 4, 4, 4, 4, 4, 4, 4],
+    [1, 1, 2, 3, 3, 2, 1, 1],
+    [1, 2, 3, 4, 4, 3, 2, 1],
+    [1, 2, 3, 4, 4, 3, 2, 1],
+    [1, 1, 2, 3, 3, 2, 1, 1],
+    [4, 4, 4, 4, 4, 4, 4, 4],
+    [4, 3, 4, 4, 4, 4, 3, 4],
+]
 
-queen_scores = [[0.0, 0.2, 0.2, 0.3, 0.3, 0.2, 0.2, 0.0],
-                [0.2, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.2],
-                [0.2, 0.4, 0.5, 0.5, 0.5, 0.5, 0.4, 0.2],
-                [0.3, 0.4, 0.5, 0.5, 0.5, 0.5, 0.4, 0.3],
-                [0.4, 0.4, 0.5, 0.5, 0.5, 0.5, 0.4, 0.3],
-                [0.2, 0.5, 0.5, 0.5, 0.5, 0.5, 0.4, 0.2],
-                [0.2, 0.4, 0.5, 0.4, 0.4, 0.4, 0.4, 0.2],
-                [0.0, 0.2, 0.2, 0.3, 0.3, 0.2, 0.2, 0.0]]
+queen_scores = [
+    [1, 1, 1, 3, 1, 1, 1, 1],
+    [1, 2, 3, 3, 3, 1, 1, 1],
+    [1, 4, 3, 3, 3, 4, 2, 1],
+    [1, 2, 3, 3, 3, 2, 2, 1],
+    [1, 2, 3, 3, 3, 2, 2, 1],
+    [1, 4, 3, 3, 3, 4, 2, 1],
+    [1, 1, 2, 3, 3, 1, 1, 1],
+    [1, 1, 1, 3, 1, 1, 1, 1],
+]
 
-pawn_scores = [[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
-               [0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7],
-               [0.3, 0.3, 0.4, 0.5, 0.5, 0.4, 0.3, 0.3],
-               [0.25, 0.25, 0.3, 0.45, 0.45, 0.3, 0.25, 0.25],
-               [0.2, 0.2, 0.2, 0.4, 0.4, 0.2, 0.2, 0.2],
-               [0.25, 0.15, 0.1, 0.2, 0.2, 0.1, 0.15, 0.25],
-               [0.25, 0.3, 0.3, 0.0, 0.0, 0.3, 0.3, 0.25],
-               [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]]
+pawn_scores = [
+    [8, 8, 8, 8, 8, 8, 8, 8],
+    [8, 8, 8, 8, 8, 8, 8, 8],
+    [5, 6, 6, 7, 7, 6, 6, 5],
+    [2, 3, 3, 5, 5, 3, 3, 2],
+    [1, 2, 3, 4, 4, 3, 2, 1],
+    [1, 1, 2, 3, 3, 2, 1, 1],
+    [1, 1, 1, 0, 0, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+]
 
 piece_position_scores = {"N": knight_scores,
                          "n": knight_scores[::-1],
@@ -92,14 +102,16 @@ def scoreBoard(board):
 
 # Find the best move using the Minimax algorithm
 def findMoveMinimax(board, depth):
-    if depth == 0:
+    #if leaf node
+    if depth == 0 or not list(board.legal_moves) or board.is_game_over():
         return [scoreBoard(board), None]
     
     valid_moves = list(board.legal_moves)
+
     random.shuffle(valid_moves)
     
     if board.turn:  # White's turn, maximize score
-        max_score = -CHECKMATE
+        max_score = -float('inf')
         best_move = None
         for move in valid_moves:
             board.push(move)
@@ -111,7 +123,7 @@ def findMoveMinimax(board, depth):
         return [max_score, best_move]
     
     else:  # Black's turn, minimize score
-        min_score = CHECKMATE
+        min_score = float('inf')
         best_move = None
         for move in valid_moves:
             board.push(move)
@@ -124,17 +136,18 @@ def findMoveMinimax(board, depth):
 
 # Find the best move using the Minimax algorithm with alpha-beta pruning
 def findMoveAlphaBeta(board, depth, alpha, beta):
-    if depth == 0:
+    #if leaf node
+    if depth == 0 or not list(board.legal_moves) or board.is_game_over():
         return [scoreBoard(board), None]
 
     valid_moves = list(board.legal_moves)
     random.shuffle(valid_moves)
     
     if board.turn:  # White's turn, maximize score
-        max_score = -CHECKMATE
+        max_score = -float('inf')
         best_move = None
         for move in valid_moves:
-            board.push(move)
+            board.push(move) 
             score, _ = findMoveAlphaBeta(board, depth - 1, alpha, beta)
             if score > max_score:
                 max_score = score
@@ -146,7 +159,7 @@ def findMoveAlphaBeta(board, depth, alpha, beta):
         return [max_score, best_move]
     
     else:  # Black's turn, minimize score
-        min_score = CHECKMATE
+        min_score = float('inf')
         best_move = None
         for move in valid_moves:
             board.push(move)
@@ -160,27 +173,39 @@ def findMoveAlphaBeta(board, depth, alpha, beta):
                 break
         return [min_score, best_move]
 
-
 # Test case
 if __name__ == '__main__':
     board = chess.Board()
+    no_progress_moves = 0  # Counter for moves without progress
 
-    while(True):
-        if board.turn:
-            next_move = findMoveAlphaBeta(board, 4, -float('inf'), float('inf'))[1]   #white side use AlphaBeta algorithm
-        else:
-            next_move = findMoveMinimax(board, 3)[1]                                  #black side use Minimax algorithm
-        
-        if next_move is None:   #stalemate or checkmate
+    while True:
+        if no_progress_moves >= 50:  # Check for 50-move rule
+            print("Stalemate due to 50 moves with   out progress.")
             break
+
+        if board.turn:
+            next_move = findMoveAlphaBeta(board, 4, -float('inf'), float('inf'))[1]
+        else:
+            next_move = findMoveMinimax(board, 3)[1]
         
+        if next_move is None:
+            break
+
+        # Check for capture or pawn move
+        if board.is_capture(next_move) or board.piece_at(next_move.from_square).piece_type == chess.PAWN:
+            no_progress_moves = 0  # Reset counter
+        else:
+            no_progress_moves += 1  # Increment counter
+
         board.push(next_move)
-        print(next_move)
         print(scoreBoard(board))
         print(board)
         print()
     
-    if(board.is_checkmate()):
-        print('Checkmate')
-    else:
+    result = board.result()
+    if result == '1-0':
+        print('White wins')
+    if result == '0-1':
+        print('Black wins')
+    if result == '1/2-1/2':
         print('Stalemate')
