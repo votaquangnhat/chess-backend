@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 from flask_socketio import SocketIO, emit
 import chess
 import minimax_alphabeta
+import mcts
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -61,8 +62,8 @@ def handle_ai_move(data):
             move = minimax_alphabeta.findMoveMinimax(game, 3)[1]
         elif mode == "AlphaBeta":
             move = minimax_alphabeta.findMoveAlphaBeta(game, 4, -float('inf'), float('inf'))[1]
-        elif move_uci == "MCTS":
-            move_uci = None
+        elif mode == "MCTS":
+            move = mcts.mcts_findNextMove(game, 3)
         elif mode == "MCTS_NN":
             move_uci = None
 
@@ -75,7 +76,7 @@ def handle_ai_move(data):
                 else:
                     emit('update', {'fen': game.fen(),
                                     'turn': 'white' if game.turn else 'black',
-                                    'message': ('black' if game.turn else 'white') + ':' + chess.Move.uci(move)},
+                                    'message': ('black' if game.turn else 'white') + ':' + chess.Move.uci(move) + f' (from {mode})'},
                         broadcast=True)
             else:
                 emit('error', {'message': 'Illegal move'}, broadcast=True)
