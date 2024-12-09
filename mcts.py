@@ -152,11 +152,13 @@ def mcts_findNextMove(game, iteration=10):
         root = node()
         root.state = board
         result = mcts_pred(root,board.is_game_over(),white, iteration)
+        if result == -1: return None
         move = board.push_san(result)
     else:
         root = node()
         root.state = board
         result = mcts_pred(root,board.is_game_over(),white, iteration)
+        if result == -1: return None
         move = board.push_san(result)
     
     return move
